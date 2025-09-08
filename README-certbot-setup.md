@@ -32,7 +32,7 @@ A comprehensive bash script that automates Let's Encrypt certificate generation 
 ## Prerequisites
 
 ### System Requirements
-- Ubuntu server with sudo access
+- Linux server with sudo access (Ubuntu, Amazon Linux, CentOS/RHEL)
 - Python 3 and pip installed
 - Certbot and plugins installed (see installation guide below)
 
@@ -41,12 +41,13 @@ A comprehensive bash script that automates Let's Encrypt certificate generation 
 - API token with `Zone:DNS:Edit` permissions
 - DNS records pointing to your server
 
-### Installation
+## Installation
 
-Follow the detailed installation guide in `dns01-cerbot-renewal.txt` or run:
+### Ubuntu/Debian
 
 ```bash
 # Install system dependencies
+sudo apt update
 sudo apt install python3 python3-dev python3-venv libaugeas-dev gcc
 
 # Create virtual environment
@@ -58,6 +59,98 @@ sudo /opt/certbot/bin/pip install certbot certbot-nginx certbot-dns-cloudflare c
 
 # Create symbolic link
 sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+### Amazon Linux 2
+
+```bash
+# Install system dependencies
+sudo yum update -y
+sudo yum install -y python3 python3-pip python3-devel gcc libffi-devel openssl-devel
+
+# Create virtual environment
+sudo python3 -m venv /opt/certbot/
+
+# Install Certbot and plugins
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx certbot-dns-cloudflare cryptography
+
+# Create symbolic link
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+### Amazon Linux 2023
+
+```bash
+# Install system dependencies
+sudo dnf update -y
+sudo dnf install -y python3 python3-pip python3-devel gcc libffi-devel openssl-devel
+
+# Create virtual environment
+sudo python3 -m venv /opt/certbot/
+
+# Install Certbot and plugins
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx certbot-dns-cloudflare cryptography
+
+# Create symbolic link
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+### CentOS 7/RHEL 7
+
+```bash
+# Install EPEL repository
+sudo yum install -y epel-release
+
+# Install system dependencies
+sudo yum install -y python3 python3-pip python3-devel gcc libffi-devel openssl-devel
+
+# Create virtual environment
+sudo python3 -m venv /opt/certbot/
+
+# Install Certbot and plugins
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx certbot-dns-cloudflare cryptography
+
+# Create symbolic link
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+### CentOS 8+/RHEL 8+/Rocky Linux/AlmaLinux
+
+```bash
+# Install system dependencies
+sudo dnf install -y python3 python3-pip python3-devel gcc libffi-devel openssl-devel
+
+# Create virtual environment
+sudo python3 -m venv /opt/certbot/
+
+# Install Certbot and plugins
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx certbot-dns-cloudflare cryptography
+
+# Create symbolic link
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+# Verify installation
+certbot --version
+```
+
+### Verification
+
+After installation, verify that certbot is working:
+
+```bash
+# Check certbot version
+certbot --version
+
+# Check available plugins
+certbot plugins
+
+# Test with staging (dry run)
+sudo certbot certonly --staging --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini -d example.com --dry-run
 ```
 
 ## Usage
@@ -185,6 +278,61 @@ All operations are logged to `/var/log/certbot-setup.log` with timestamps and se
    - Try with `-s` flag for staging environment
    - Use `-v` flag for verbose output
 
+5. **Platform-specific issues:**
+   - **Amazon Linux**: Ensure EPEL repository is enabled
+   - **CentOS/RHEL**: Install `epel-release` package first
+   - **Python issues**: Verify Python 3 and pip are properly installed
+   - **Permission issues**: Check SELinux status (CentOS/RHEL)
+
+### Platform-Specific Troubleshooting
+
+#### Amazon Linux 2
+```bash
+# Enable EPEL repository
+sudo amazon-linux-extras install epel -y
+
+# Check Python installation
+python3 --version
+pip3 --version
+
+# Install missing dependencies
+sudo yum install -y python3-devel libffi-devel openssl-devel
+```
+
+#### Amazon Linux 2023
+```bash
+# Check Python installation
+python3 --version
+pip3 --version
+
+# Install missing dependencies
+sudo dnf install -y python3-devel libffi-devel openssl-devel
+```
+
+#### CentOS/RHEL
+```bash
+# Install EPEL repository
+sudo yum install -y epel-release
+
+# Check SELinux status
+sestatus
+
+# If SELinux is enforcing, temporarily disable for testing
+sudo setenforce 0
+
+# Install missing dependencies
+sudo yum install -y python3-devel libffi-devel openssl-devel
+```
+
+#### Ubuntu/Debian
+```bash
+# Update package lists
+sudo apt update
+
+# Install missing dependencies
+sudo apt install -y python3-dev libaugeas-dev libffi-dev
+```
+
 ### Debugging Steps
 
 1. **Check logs:**
@@ -205,6 +353,17 @@ All operations are logged to `/var/log/certbot-setup.log` with timestamps and se
 4. **Check permissions:**
    ```bash
    ls -la /etc/letsencrypt/cloudflare.ini
+   ```
+
+5. **Verify certbot installation:**
+   ```bash
+   certbot --version
+   certbot plugins
+   ```
+
+6. **Test Python environment:**
+   ```bash
+   python3 -c "import certbot; print('Certbot Python module loaded successfully')"
    ```
 
 ## Automation
