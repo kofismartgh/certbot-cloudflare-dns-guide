@@ -1,0 +1,26 @@
+# Cloudflare API Credentials Template
+# ===================================
+# This file contains the Cloudflare API token used by Certbot for DNS validation
+# 
+# Instructions:
+# 1. Replace YOUR_CLOUDFLARE_API_TOKEN_HERE with your actual API token
+# 2. Ensure the file has proper permissions (600)
+# 3. Keep this file secure and never commit it to version control
+#
+# Getting your API token:
+# 1. Log into Cloudflare Dashboard: https://dash.cloudflare.com/
+# 2. Go to "My Profile" → "API Tokens"
+# 3. Create a new token with the following permissions:
+#    - Zone:Zone:Read
+#    - Zone:DNS:Edit
+# 4. Set Zone Resources to "Include - All zones" or specific zones
+# 5. Copy the generated token and replace the placeholder below
+#
+# Security Notes:
+# - This file should have 600 permissions (readable only by owner)
+# - Consider using AWS Secrets Manager or similar for production environments
+# - Rotate your API tokens regularly
+# - Monitor API token usage in Cloudflare dashboard
+
+# Cloudflare API token used by Certbot
+dns_cloudflare_api_token = YOUR_CLOUDFLARE_API_TOKEN_HERE
